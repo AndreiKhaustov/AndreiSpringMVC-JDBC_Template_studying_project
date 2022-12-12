@@ -6,6 +6,18 @@
 </head>
 <body>
 <a th:text="${person.getName()}">value</a>
+<br/>
 <a th:text="${person.getId()}">value</a>
+<br/>
+<a th:text="${person.getAge()}">value</a>
+<br/>
+<a th:text="${person.getEmail()}">value</a>
+<br/>
+<a th:href="@{/people/{id}/edit(id=${person.getId()})}">Edit</a>
+
+<form th:method="DELETE" th:action="@{/people/{id}(id=${person.getId()})}">
+
+    <input type = "submit" value="Delete"/>
+</form>
 </body>
 </html>

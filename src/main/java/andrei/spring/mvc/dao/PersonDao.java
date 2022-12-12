@@ -1,34 +1,39 @@
 package andrei.spring.mvc.dao;
 
 import andrei.spring.mvc.models.Person;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 @Component
 public class PersonDao {
-    private static int count;
-    private List<Person> people;
-    {
-        people = new ArrayList<>();
-        people.add(new Person(++count, "Andrei"));
-        people.add(new Person(++count, "Maxim"));
-        people.add(new Person(++count, "David"));
+   private final JdbcTemplate jdbcTemplate;
+@Autowired
+    public PersonDao(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
+
     public List<Person> index() {
-        return people;
+   return jdbcTemplate.query("SELECT * FROM Person", new BeanPropertyRowMapper<>(Person.class));
     }
     public Person show(int id){
-        return people.stream().filter(person -> person.getId()==id).findAny().orElse(null);
+   return jdbcTemplate.query("SELECT * FROM Person WHERE id=?", new Object[]{id}, new BeanPropertyRowMapper<>(Person.class)).stream().findAny().orElse(null);
     }
     public void save(Person person) {
-        person.setId(++count);
-       people.add(person);
+
+       jdbcTemplate.update("INSERT INTO Person VALUES(1, ?,?,?)", person.getName(), person.getAge(), person.getEmail());
 
     }
     public void update(int id, Person updatedPerson){
-         Person personToBeUpdated = show(id);
-         personToBeUpdated.setName(updatedPerson.getName());
+       jdbcTemplate.update("UPDATE Person SET name=?, age=?, email=? WHERE id=?", updatedPerson.getName(), updatedPerson.getAge(), updatedPerson.getEmail(), id);
+    }
+
+    public void delete(int id) {
+      jdbcTemplate.update("DELETE FROM Person WHERE id=?", id);
     }
 }
